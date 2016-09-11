@@ -28,8 +28,8 @@ set -o pipefail
 ## Variable Declartions ##
 
 # Get Instance Details
-instance_id=$(wget -q -O- http://169.254.169.254/latest/meta-data/instance-id)
-region=$(wget -q -O- http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e 's/\([1-9]\).$/\1/g')
+instance_id=$(ec2metadata|grep 'instance-id'|awk '{print $2}')
+region=$(ec2metadata|grep 'availability-zone'|awk '{print $2}'|sed 's/[a-z]$//g')
 
 # Set Logging Options
 logfile="/var/log/ebs-snapshot.log"
@@ -55,16 +55,6 @@ log_setup() {
 # Function: Log an event.
 log() {
     echo "[$(date +"%Y-%m-%d"+"%T")]: $*"
-}
-
-# Function: Confirm that the AWS CLI and related tools are installed.
-prerequisite_check() {
-	for prerequisite in aws wget; do
-		hash $prerequisite &> /dev/null
-		if [[ $? == 1 ]]; then
-			echo "In order to use this script, the executable \"$prerequisite\" must be installed." 1>&2; exit 70
-		fi
-	done
 }
 
 # Function: Snapshot all volumes attached to this instance.
