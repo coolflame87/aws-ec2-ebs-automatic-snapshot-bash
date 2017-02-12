@@ -28,8 +28,8 @@ set -o pipefail
 ## Variable Declartions ##
 
 # Get Instance Details
-instance_id=$(ec2metadata|grep 'instance-id'|awk '{print $2}')
-region=$(ec2metadata|grep 'availability-zone'|awk '{print $2}'|sed 's/[a-z]$//g')
+instance_id=$(ec2metadata --instance-id)
+region=$(ec2metadata --availability-zone)
 
 # Set Logging Options
 logfile="/var/log/ebs-snapshot.log"
