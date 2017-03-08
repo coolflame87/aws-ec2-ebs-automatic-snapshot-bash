@@ -36,7 +36,8 @@ Pull requests greatly welcomed!
                 "ec2:CreateTags",
                 "ec2:DeleteSnapshot",
                 "ec2:DescribeSnapshots",
-                "ec2:DescribeVolumes"
+                "ec2:DescribeVolumes",
+                "ec2:DescribeTags"
             ],
             "Resource": [
                 "*"
