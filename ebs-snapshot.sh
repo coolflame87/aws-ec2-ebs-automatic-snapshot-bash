@@ -24,23 +24,17 @@ set -o pipefail
 # Make sure that you understand how the script works. No responsibility accepted in event of accidental data loss.
 #
 
-
-## Variable Declartions ##
-
-# Get Instance Details
-instance_id=$(ec2metadata --instance-id)
-region=$(ec2metadata --availability-zone | sed -e 's/\([1-9]\).$/\1/g')
-
-# Set Logging Options
-logfile="/var/log/ebs-snapshot.log"
-logfile_max_lines="5000"
-
-# How many days do you wish to retain backups for? Default: 7 days
-retention_days="7"
-retention_date_in_seconds=$(date +%s --date "$retention_days days ago")
-
-
 ## Function Declarations ##
+
+# Function: Confirm that the AWS CLI and related tools are installed.
+prerequisite_check() {
+	for prerequisite in aws ec2metadata date; do
+		hash $prerequisite &> /dev/null
+		if [[ $? == 1 ]]; then
+			echo "In order to use this script, the executable \"$prerequisite\" must be installed." 1>&2; exit 70
+		fi
+	done
+}
 
 # Function: Setup logfile and redirect stdout/stderr.
 log_setup() {
@@ -98,6 +92,22 @@ cleanup_snapshots() {
 	done
 }	
 
+#calls pre-requisite check function to ensure that all executables required for script execution are available
+prerequisite_check
+
+## Variable Declartions ##
+
+# Get Instance Details
+instance_id=$(ec2metadata --instance-id)
+region=$(ec2metadata --availability-zone | sed -e 's/\([1-9]\).$/\1/g')
+
+# Set Logging Options
+logfile="/var/log/ebs-snapshot.log"
+logfile_max_lines="5000"
+
+# How many days do you wish to retain backups for? Default: 7 days
+retention_days="7"
+retention_date_in_seconds=$(date +%s --date "$retention_days days ago")
 
 ## SCRIPT COMMANDS ##
 
